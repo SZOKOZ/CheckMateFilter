@@ -5,6 +5,8 @@ import com.filter.textcorrector.profanity_filtering.dictionary.DictionaryFactory
 import com.filter.textcorrector.profanity_filtering.model.Censored;
 import com.filter.textcorrector.spellchecking.Language;
 import com.filter.textcorrector.text_preproccessing.util.TextUtils;
+import com.filter.textcorrector.util.TextProcessor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,28 @@ public class ProfanityFilter {
         LOGGER.debug("Censoring took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
 
         return new Censored(input, badWords, !badWords.isEmpty());
+    }
+    
+    public double profanityPercentage(String input)
+    {
+    	if (input.isEmpty())
+    	{
+    		LOGGER.debug("Empty input given.");
+    		return 0;
+    	}
+    	
+    	LOGGER.debug("Given text: " + input);
+    	long startProccessingTime = System.nanoTime();
+
+    	Set<String> badWords = dictionary.search(input);
+    	double percentage = (double)badWords.size()/TextProcessor.WordCount(input)*100;
+    	
+    	long endProccessingTime = System.nanoTime();
+    	
+    	LOGGER.debug(String.format("Percentage of profanity in text: %f", percentage)+"%");
+    	LOGGER.debug("Calculating profanity percentage took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
+    	
+    	return percentage;
     }
 
     public void changeLanguage(Language language){
@@ -187,5 +211,6 @@ public class ProfanityFilter {
         System.out.println(profanityFilter.searchForProfanity("stupid motherfucker"));
         System.out.println(profanityFilter.searchForProfanity("clit"));
         System.out.println(profanityFilter.censor("Little piece of shit and silly cunt"));
+        System.out.println(profanityFilter.profanityPercentage("Gay cunt you fucking bitch nigga ass nibba"));
     }
 }
